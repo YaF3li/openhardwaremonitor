@@ -44,6 +44,7 @@ namespace OpenHardwareMonitor.Hardware.CPU {
 
     private readonly CPULoad cpuLoad;
     private readonly Sensor totalLoad;
+    private readonly Sensor maxLoad;
     private readonly Sensor[] coreLoads;
 
     protected string CoreString(int i) {
@@ -93,9 +94,15 @@ namespace OpenHardwareMonitor.Hardware.CPU {
         totalLoad = new Sensor("CPU Total", 0, SensorType.Load, this, settings);
       else
         totalLoad = null;
+
+      if (coreCount > 1)
+        maxLoad = new Sensor("CPU Core Max", 1, SensorType.Load, this, settings);
+      else
+        maxLoad = null;
+
       coreLoads = new Sensor[coreCount];
       for (int i = 0; i < coreLoads.Length; i++)
-        coreLoads[i] = new Sensor(CoreString(i), i + 1,
+        coreLoads[i] = new Sensor(CoreString(i), i + 2,
           SensorType.Load, this, settings);
       cpuLoad = new CPULoad(cpuid);
       if (cpuLoad.IsAvailable) {
@@ -103,6 +110,8 @@ namespace OpenHardwareMonitor.Hardware.CPU {
           ActivateSensor(sensor);
         if (totalLoad != null)
           ActivateSensor(totalLoad);
+        if (maxLoad != null)
+          ActivateSensor(maxLoad);
       }
 
       if (hasTimeStampCounter) {
@@ -306,6 +315,8 @@ namespace OpenHardwareMonitor.Hardware.CPU {
           coreLoads[i].Value = cpuLoad.GetCoreLoad(i);
         if (totalLoad != null)
           totalLoad.Value = cpuLoad.GetTotalLoad();
+        if (maxLoad != null)
+          maxLoad.Value = cpuLoad.GetMaxLoad();
       }
     }
   }
