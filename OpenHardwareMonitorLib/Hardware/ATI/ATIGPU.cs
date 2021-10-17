@@ -42,11 +42,13 @@ namespace OpenHardwareMonitor.Hardware.ATI {
     private readonly Sensor socVoltage;
     private readonly Sensor coreLoad;
     private readonly Sensor memoryLoad;
+    private readonly Sensor memoryLoadData;
     private readonly Sensor controlSensor;
     private readonly Control fanControl;
 
     private IntPtr context;
     private readonly int overdriveVersion;
+    private readonly long memorySize;
 
     public ATIGPU(string name, int adapterIndex, int busNumber, 
       int deviceNumber, IntPtr context, ISettings settings) 
@@ -63,6 +65,12 @@ namespace OpenHardwareMonitor.Hardware.ATI {
         out overdriveVersion) != ADLStatus.OK)
       {
         overdriveVersion = -1;
+      }
+
+      ADLMemoryInfo memoryInfo;
+      if (ADL.ADL_Adapter_MemoryInfo_Get(adapterIndex, out memoryInfo)
+        == ADLStatus.OK) {
+        memorySize = memoryInfo.MemorySize;
       }
 
       this.temperatureCore = 
@@ -104,6 +112,8 @@ namespace OpenHardwareMonitor.Hardware.ATI {
 
       this.coreLoad = new Sensor("GPU Core", 0, SensorType.Load, this, settings);
       this.memoryLoad = new Sensor("GPU Memory", 1, SensorType.Load, this, settings);
+
+      this.memoryLoadData = new Sensor("GPU Memory", 0, SensorType.Data, this, settings);
 
       this.controlSensor = new Sensor("GPU Fan", 0, SensorType.Control, this, settings);
 
@@ -487,6 +497,7 @@ namespace OpenHardwareMonitor.Hardware.ATI {
         GetPMLog(data, ADLSensorType.SOC_VOLTAGE, socVoltage, 0.001f);
         GetPMLog(data, ADLSensorType.INFO_ACTIVITY_GFX, coreLoad);
         GetPMLog(data, ADLSensorType.INFO_ACTIVITY_MEM, memoryLoad);
+        GetPMLog(data, ADLSensorType.INFO_ACTIVITY_MEM, memoryLoadData, memorySize / (1024 * 1024) / (1024 * 100f));
         GetPMLog(data, ADLSensorType.FAN_PERCENTAGE, controlSensor);
       } else {
         if (context != IntPtr.Zero && overdriveVersion >= 7) {
