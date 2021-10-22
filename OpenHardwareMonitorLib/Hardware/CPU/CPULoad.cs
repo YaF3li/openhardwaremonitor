@@ -39,7 +39,8 @@ namespace OpenHardwareMonitor.Hardware.CPU {
     private long[] totalTimes;
 
     private double totalLoad;
-    private double maxLoad;
+    private double maxCoreLoad;
+    private double maxThreadLoad;
     private readonly double[] coreLoads;
 
     private readonly bool available;
@@ -74,7 +75,8 @@ namespace OpenHardwareMonitor.Hardware.CPU {
       this.cpuid = cpuid;
       this.coreLoads = new Double[cpuid.Length];         
       this.totalLoad = 0;
-      this.maxLoad = 0;
+      this.maxCoreLoad = 0;
+      this.maxThreadLoad = 0;
       try {
         GetTimes(out idleTimes, out totalTimes);
       } catch (Exception) {
@@ -93,8 +95,12 @@ namespace OpenHardwareMonitor.Hardware.CPU {
       return totalLoad;
     }
 
-    public double GetMaxLoad() {
-      return maxLoad;
+    public double GetMaxCoreLoad() {
+      return maxCoreLoad;
+    }
+
+    public double GetMaxThreadLoad() {
+      return maxThreadLoad;
     }
 
     public double GetCoreLoad(int core) {
@@ -119,7 +125,8 @@ namespace OpenHardwareMonitor.Hardware.CPU {
         return;
 
       double total = 0;
-      double max = 0;
+      double maxCore = 0;
+      double maxThread = 0;
       int count = 0;
       for (int i = 0; i < cpuid.Length; i++) {
         double value = 0;
@@ -133,12 +140,17 @@ namespace OpenHardwareMonitor.Hardware.CPU {
             value += idle;
             total += idle;
             count++;
+
+            double threadValue = 1.0 - idle;
+            threadValue = threadValue < 0 ? 0 : threadValue;
+            if (threadValue > maxThread)
+              maxThread = threadValue;
           }
         }
         value = 1.0f - value / cpuid[i].Length;
         value = value < 0 ? 0 : value;
-        if (value > max)
-          max = value;
+        if (value > maxCore)
+          maxCore = value;
         coreLoads[i] = value * 100;
       }
       if (count > 0) {
@@ -148,7 +160,8 @@ namespace OpenHardwareMonitor.Hardware.CPU {
         total = 0;
       }
       this.totalLoad = total * 100;
-      this.maxLoad = max * 100;
+      this.maxCoreLoad = maxCore * 100;
+      this.maxThreadLoad = maxThread * 100;
 
       this.totalTimes = newTotalTimes;
       this.idleTimes = newIdleTimes;

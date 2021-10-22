@@ -44,7 +44,8 @@ namespace OpenHardwareMonitor.Hardware.CPU {
 
     private readonly CPULoad cpuLoad;
     private readonly Sensor totalLoad;
-    private readonly Sensor maxLoad;
+    private readonly Sensor maxCoreLoad;
+    private readonly Sensor maxThreadLoad;
     private readonly Sensor[] coreLoads;
 
     protected string CoreString(int i) {
@@ -95,10 +96,18 @@ namespace OpenHardwareMonitor.Hardware.CPU {
       else
         totalLoad = null;
 
+      // Maximum load of any core
       if (coreCount > 1)
-        maxLoad = new Sensor("CPU Core Max", 1, SensorType.Load, this, settings);
+        maxCoreLoad = new Sensor("CPU Core Max", 1, SensorType.Load, this, settings);
       else
-        maxLoad = null;
+        maxCoreLoad = null;
+
+      // Check if we have SMT / HT, also show max. load of any thread
+      int threadsPerCore = Environment.ProcessorCount / coreCount;
+      if (threadsPerCore > 1)
+        maxThreadLoad = new Sensor("CPU Thread Max", 2, SensorType.Load, this, settings);
+      else
+        maxThreadLoad = null;
 
       coreLoads = new Sensor[coreCount];
       for (int i = 0; i < coreLoads.Length; i++)
@@ -110,8 +119,10 @@ namespace OpenHardwareMonitor.Hardware.CPU {
           ActivateSensor(sensor);
         if (totalLoad != null)
           ActivateSensor(totalLoad);
-        if (maxLoad != null)
-          ActivateSensor(maxLoad);
+        if (maxCoreLoad != null)
+          ActivateSensor(maxCoreLoad);
+        if (maxThreadLoad != null)
+          ActivateSensor(maxThreadLoad);
       }
 
       if (hasTimeStampCounter) {
@@ -315,8 +326,10 @@ namespace OpenHardwareMonitor.Hardware.CPU {
           coreLoads[i].Value = cpuLoad.GetCoreLoad(i);
         if (totalLoad != null)
           totalLoad.Value = cpuLoad.GetTotalLoad();
-        if (maxLoad != null)
-          maxLoad.Value = cpuLoad.GetMaxLoad();
+        if (maxCoreLoad != null)
+          maxCoreLoad.Value = cpuLoad.GetMaxCoreLoad();
+        if (maxThreadLoad != null)
+          maxThreadLoad.Value = cpuLoad.GetMaxThreadLoad();
       }
     }
   }
