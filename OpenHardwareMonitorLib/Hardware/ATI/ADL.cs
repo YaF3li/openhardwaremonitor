@@ -382,6 +382,8 @@ namespace OpenHardwareMonitor.Hardware.ATI {
       out ADLVersionsInfo versionInfo);
     public delegate ADLStatus ADL_Adapter_MemoryInfo_GetDelegate(int adapterIndex,
       out ADLMemoryInfo memoryInfo);
+    public delegate ADLStatus ADL2_Adapter_DedicatedVRAMUsage_GetDelegate(IntPtr context,
+      int adapterIndex, out int iVRAMUsageInMB);
 
     private static ADL_Main_Control_CreateDelegate
       _ADL_Main_Control_Create;
@@ -430,6 +432,8 @@ namespace OpenHardwareMonitor.Hardware.ATI {
       ADL_Graphics_Versions_Get;
     public static ADL_Adapter_MemoryInfo_GetDelegate
       ADL_Adapter_MemoryInfo_Get;
+    public static ADL2_Adapter_DedicatedVRAMUsage_GetDelegate
+      ADL2_Adapter_DedicatedVRAMUsage_Get;
 
     private static string dllName;
 
@@ -495,7 +499,9 @@ namespace OpenHardwareMonitor.Hardware.ATI {
         out ADL_Graphics_Versions_Get);
       GetDelegate("ADL_Adapter_MemoryInfo_Get",
         out ADL_Adapter_MemoryInfo_Get);
-  }
+      GetDelegate("ADL2_Adapter_DedicatedVRAMUsage_Get",
+        out ADL2_Adapter_DedicatedVRAMUsage_Get);
+    }
 
     static ADL() {
       CreateDelegates("atiadlxx");

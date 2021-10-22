@@ -42,7 +42,8 @@ namespace OpenHardwareMonitor.Hardware.ATI {
     private readonly Sensor socVoltage;
     private readonly Sensor coreLoad;
     private readonly Sensor memoryLoad;
-    private readonly Sensor memoryLoadData;
+    private readonly Sensor memoryUsageGB;
+    private readonly Sensor memoryUsage;
     private readonly Sensor controlSensor;
     private readonly Control fanControl;
 
@@ -111,9 +112,10 @@ namespace OpenHardwareMonitor.Hardware.ATI {
       this.socVoltage = new Sensor("GPU SOC", 2, SensorType.Voltage, this, settings);
 
       this.coreLoad = new Sensor("GPU Core", 0, SensorType.Load, this, settings);
-      this.memoryLoad = new Sensor("GPU Memory", 1, SensorType.Load, this, settings);
+      this.memoryLoad = new Sensor("GPU Memory Load", 1, SensorType.Load, this, settings);
+      this.memoryUsage = new Sensor("GPU Memory Usage", 2, SensorType.Load, this, settings);
 
-      this.memoryLoadData = new Sensor("GPU Memory", 0, SensorType.Data, this, settings);
+      this.memoryUsageGB = new Sensor("GPU Memory Usage", 0, SensorType.Data, this, settings);
 
       this.controlSensor = new Sensor("GPU Fan", 0, SensorType.Control, this, settings);
 
@@ -497,8 +499,19 @@ namespace OpenHardwareMonitor.Hardware.ATI {
         GetPMLog(data, ADLSensorType.SOC_VOLTAGE, socVoltage, 0.001f);
         GetPMLog(data, ADLSensorType.INFO_ACTIVITY_GFX, coreLoad);
         GetPMLog(data, ADLSensorType.INFO_ACTIVITY_MEM, memoryLoad);
-        GetPMLog(data, ADLSensorType.INFO_ACTIVITY_MEM, memoryLoadData, memorySize / (1024 * 1024) / (1024 * 100f));
         GetPMLog(data, ADLSensorType.FAN_PERCENTAGE, controlSensor);
+
+        int memoryUsageInMB = 0;
+        ADLStatus status = ADL.ADL2_Adapter_DedicatedVRAMUsage_Get(context, adapterIndex, out memoryUsageInMB);
+        if (status == ADLStatus.OK) {
+          memoryUsageGB.Value = memoryUsageInMB / 1024.0;
+          memoryUsage.Value = memoryUsageInMB * 1024L * 1024L * 100.0 / memorySize;
+          ActivateSensor(memoryUsageGB);
+          ActivateSensor(memoryUsage);
+        } else {
+          DeactivateSensor(memoryUsageGB);
+          DeactivateSensor(memoryUsage);
+        }
       } else {
         if (context != IntPtr.Zero && overdriveVersion >= 7) {
           GetODNTemperature(ADLODNTemperatureType.CORE, temperatureCore);
