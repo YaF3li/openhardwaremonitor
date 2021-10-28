@@ -86,6 +86,7 @@ namespace OpenHardwareMonitor.GUI {
             this.plotBottomMenuItem = new System.Windows.Forms.MenuItem();
             this.plotRightMenuItem = new System.Windows.Forms.MenuItem();
             this.logSeparatorMenuItem = new System.Windows.Forms.MenuItem();
+            this.fastGadgetMenuItem = new System.Windows.Forms.MenuItem();
             this.logSensorsMenuItem = new System.Windows.Forms.MenuItem();
             this.loggingIntervalMenuItem = new System.Windows.Forms.MenuItem();
             this.log1sMenuItem = new System.Windows.Forms.MenuItem();
@@ -377,6 +378,7 @@ namespace OpenHardwareMonitor.GUI {
             this.temperatureUnitsMenuItem,
             this.plotLocationMenuItem,
             this.logSeparatorMenuItem,
+            this.fastGadgetMenuItem,
             this.logSensorsMenuItem,
             this.loggingIntervalMenuItem,
             this.webMenuItemSeparator,
@@ -462,14 +464,19 @@ namespace OpenHardwareMonitor.GUI {
             this.logSeparatorMenuItem.Index = 7;
             this.logSeparatorMenuItem.Text = "-";
             // 
+            // fastGadgetMenuItem
+            // 
+            this.fastGadgetMenuItem.Index = 8;
+            this.fastGadgetMenuItem.Text = "Fast Gadget Updates";
+            // 
             // logSensorsMenuItem
             // 
-            this.logSensorsMenuItem.Index = 8;
+            this.logSensorsMenuItem.Index = 9;
             this.logSensorsMenuItem.Text = "Log Sensors";
             // 
             // loggingIntervalMenuItem
             // 
-            this.loggingIntervalMenuItem.Index = 9;
+            this.loggingIntervalMenuItem.Index = 10;
             this.loggingIntervalMenuItem.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.log1sMenuItem,
             this.log2sMenuItem,
@@ -566,12 +573,12 @@ namespace OpenHardwareMonitor.GUI {
             // 
             // webMenuItemSeparator
             // 
-            this.webMenuItemSeparator.Index = 10;
+            this.webMenuItemSeparator.Index = 11;
             this.webMenuItemSeparator.Text = "-";
             // 
             // webMenuItem
             // 
-            this.webMenuItem.Index = 11;
+            this.webMenuItem.Index = 12;
             this.webMenuItem.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.runWebServerMenuItem,
             this.serverPortMenuItem});
@@ -611,7 +618,7 @@ namespace OpenHardwareMonitor.GUI {
             // 
             // timer
             // 
-            this.timer.Interval = 500;
+            this.timer.Interval = 1000;
             this.timer.Tick += new System.EventHandler(this.timer_Tick);
             // 
             // splitContainer
@@ -761,6 +768,7 @@ namespace OpenHardwareMonitor.GUI {
     private System.Windows.Forms.MenuItem gpuMenuItem;
     private System.Windows.Forms.MenuItem fanControllerMenuItem;
     private System.Windows.Forms.MenuItem ramMenuItem;
+    private System.Windows.Forms.MenuItem fastGadgetMenuItem;
     private System.Windows.Forms.MenuItem logSensorsMenuItem;
     private System.Windows.Forms.MenuItem logSeparatorMenuItem;
     private System.Windows.Forms.MenuItem loggingIntervalMenuItem;

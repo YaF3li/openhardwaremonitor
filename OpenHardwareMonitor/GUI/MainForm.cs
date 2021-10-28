@@ -69,6 +69,7 @@ namespace OpenHardwareMonitor.GUI {
     private UserOption runWebServer;
     private HttpServer server;
 
+    private UserOption fastGadgetUpdate;
     private UserOption logSensors;
     private UserRadioGroup loggingInterval;
     private Logger logger;
@@ -319,6 +320,15 @@ namespace OpenHardwareMonitor.GUI {
           server.StartHTTPListener();
         else
           server.StopHTTPListener();
+      };
+
+      fastGadgetUpdate = new UserOption("fastGadgetMenuItem", false,
+        fastGadgetMenuItem, settings, () => null);
+
+      timer.Interval = fastGadgetUpdate.Value ? 500 : 1000;
+
+      fastGadgetUpdate.Changed += delegate (object sender, EventArgs e) {
+        timer.Interval = fastGadgetUpdate.Value ? 500 : 1000;
       };
 
       logSensors = new UserOption("logSensorsMenuItem", false, logSensorsMenuItem,
@@ -607,7 +617,11 @@ namespace OpenHardwareMonitor.GUI {
     const int MIN_DELAY = 8;
     private int delayCount = 0;
     private void timer_Tick(object sender, EventArgs e) {
-      if (delayCount >= MIN_DELAY && gadget != null && updateGadgetVisitor != null) {
+      if (delayCount >= MIN_DELAY
+        && fastGadgetUpdate.Value
+        && gadget != null
+        && updateGadgetVisitor != null)
+      {
         delayCount = (delayCount + 1) % 2 + MIN_DELAY;
         if (delayCount > MIN_DELAY) {
           computer.Accept(updateGadgetVisitor);
