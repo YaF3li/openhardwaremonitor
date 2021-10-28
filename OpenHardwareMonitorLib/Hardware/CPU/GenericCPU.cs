@@ -111,7 +111,7 @@ namespace OpenHardwareMonitor.Hardware.CPU {
 
       coreLoads = new Sensor[coreCount];
       for (int i = 0; i < coreLoads.Length; i++)
-        coreLoads[i] = new Sensor(CoreString(i), i + 2,
+        coreLoads[i] = new Sensor(CoreString(i), i + 3,
           SensorType.Load, this, settings);
       cpuLoad = new CPULoad(cpuid);
       if (cpuLoad.IsAvailable) {
