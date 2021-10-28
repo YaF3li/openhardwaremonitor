@@ -86,6 +86,10 @@ namespace OpenHardwareMonitor.GUI {
           this.Image = Utilities.EmbeddedResources.GetImage("throughput.png");
           this.Text = "Throughput";
           break;
+        case SensorType.FramesPerSecond:
+          this.Image = Utilities.EmbeddedResources.GetImage("renderer.png");
+          this.Text = "Renderer";
+          break;
       }
 
       NodeAdded += new NodeEventHandler(TypeNode_NodeAdded);

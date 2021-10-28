@@ -384,6 +384,12 @@ namespace OpenHardwareMonitor.Hardware.ATI {
       out ADLMemoryInfo memoryInfo);
     public delegate ADLStatus ADL2_Adapter_DedicatedVRAMUsage_GetDelegate(IntPtr context,
       int adapterIndex, out int iVRAMUsageInMB);
+    public delegate ADLStatus ADL2_Adapter_FrameMetrics_StartDelegate(IntPtr context,
+      int adapterIndex, int vidPnSourceId);
+    public delegate ADLStatus ADL2_Adapter_FrameMetrics_StopDelegate(IntPtr context,
+      int adapterIndex, int vidPnSourceId);
+    public delegate ADLStatus ADL2_Adapter_FrameMetrics_GetDelegate(IntPtr context,
+      int adapterIndex, int vidPnSourceId, out float iFramesPerSecond);
 
     private static ADL_Main_Control_CreateDelegate
       _ADL_Main_Control_Create;
@@ -434,6 +440,12 @@ namespace OpenHardwareMonitor.Hardware.ATI {
       ADL_Adapter_MemoryInfo_Get;
     public static ADL2_Adapter_DedicatedVRAMUsage_GetDelegate
       ADL2_Adapter_DedicatedVRAMUsage_Get;
+    public static ADL2_Adapter_FrameMetrics_StartDelegate
+      ADL2_Adapter_FrameMetrics_Start;
+    public static ADL2_Adapter_FrameMetrics_StopDelegate
+      ADL2_Adapter_FrameMetrics_Stop;
+    public static ADL2_Adapter_FrameMetrics_GetDelegate
+      ADL2_Adapter_FrameMetrics_Get;
 
     private static string dllName;
 
@@ -501,6 +513,16 @@ namespace OpenHardwareMonitor.Hardware.ATI {
         out ADL_Adapter_MemoryInfo_Get);
       GetDelegate("ADL2_Adapter_DedicatedVRAMUsage_Get",
         out ADL2_Adapter_DedicatedVRAMUsage_Get);
+      GetDelegate("ADL2_Adapter_DedicatedVRAMUsage_Get",
+        out ADL2_Adapter_DedicatedVRAMUsage_Get);
+      GetDelegate("ADL2_Adapter_DedicatedVRAMUsage_Get",
+        out ADL2_Adapter_DedicatedVRAMUsage_Get);
+      GetDelegate("ADL2_Adapter_FrameMetrics_Start",
+        out ADL2_Adapter_FrameMetrics_Start);
+      GetDelegate("ADL2_Adapter_FrameMetrics_Stop",
+        out ADL2_Adapter_FrameMetrics_Stop);
+      GetDelegate("ADL2_Adapter_FrameMetrics_Get",
+        out ADL2_Adapter_FrameMetrics_Get);
     }
 
     static ADL() {

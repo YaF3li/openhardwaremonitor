@@ -18,6 +18,7 @@ namespace OpenHardwareMonitor.Hardware.ATI {
     private readonly int adapterIndex;
     private readonly int busNumber;
     private readonly int deviceNumber;
+    private readonly int vidPnSourceId;
     private readonly Sensor temperatureCore;
     private readonly Sensor temperatureMemory;
     private readonly Sensor temperatureVrmCore;
@@ -44,6 +45,7 @@ namespace OpenHardwareMonitor.Hardware.ATI {
     private readonly Sensor memoryLoad;
     private readonly Sensor memoryUsageGB;
     private readonly Sensor memoryUsage;
+    private readonly Sensor framesPerSecond;
     private readonly Sensor controlSensor;
     private readonly Control fanControl;
 
@@ -59,6 +61,7 @@ namespace OpenHardwareMonitor.Hardware.ATI {
       this.adapterIndex = adapterIndex;
       this.busNumber = busNumber;
       this.deviceNumber = deviceNumber;
+      this.vidPnSourceId = 0;
 
       this.context = context;
 
@@ -118,6 +121,17 @@ namespace OpenHardwareMonitor.Hardware.ATI {
       this.memoryUsageGB = new Sensor("GPU Memory Usage", 0, SensorType.Data, this, settings);
 
       this.controlSensor = new Sensor("GPU Fan", 0, SensorType.Control, this, settings);
+
+
+      if(context != IntPtr.Zero && 
+        ADL.ADL2_Adapter_FrameMetrics_Start(context, adapterIndex, vidPnSourceId)
+        == ADLStatus.OK)
+      {
+        this.framesPerSecond = new Sensor("GPU 3D FPS", 0, SensorType.FramesPerSecond, this, settings);
+        //ActivateSensor(this.framesPerSecond);
+      } else {
+        this.framesPerSecond = null;
+      }
 
       ADLFanSpeedInfo afsi = new ADLFanSpeedInfo();
       if (ADL.ADL_Overdrive5_FanSpeedInfo_Get(adapterIndex, 0, ref afsi)
@@ -512,6 +526,18 @@ namespace OpenHardwareMonitor.Hardware.ATI {
           DeactivateSensor(memoryUsageGB);
           DeactivateSensor(memoryUsage);
         }
+
+        if (framesPerSecond != null) {
+          float iFramesPerSecond = 0.0f;
+          if (ADL.ADL2_Adapter_FrameMetrics_Get(context, adapterIndex, vidPnSourceId, out iFramesPerSecond)
+            == ADLStatus.OK) {
+            if (iFramesPerSecond < 0.0f) iFramesPerSecond = 0.0f;
+            framesPerSecond.Value = iFramesPerSecond;
+            ActivateSensor(framesPerSecond);
+          } else {
+            framesPerSecond.Value = null;
+          }
+        }
       } else {
         if (context != IntPtr.Zero && overdriveVersion >= 7) {
           GetODNTemperature(ADLODNTemperatureType.CORE, temperatureCore);
@@ -603,6 +629,9 @@ namespace OpenHardwareMonitor.Hardware.ATI {
     }
 
     protected override void Dispose(bool disposing) {
+      if(context != IntPtr.Zero)
+        ADL.ADL2_Adapter_FrameMetrics_Stop(context, adapterIndex, vidPnSourceId);
+
       if (disposing) {
         this.fanControl.ControlModeChanged -= ControlModeChanged;
         this.fanControl.SoftwareControlValueChanged -=

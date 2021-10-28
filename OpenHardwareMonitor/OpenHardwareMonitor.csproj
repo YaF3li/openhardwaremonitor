@@ -38,6 +38,7 @@
     <None Remove="Resources\nvidia.png" />
     <None Remove="Resources\power.png" />
     <None Remove="Resources\ram.png" />
+    <None Remove="Resources\renderer.png" />
     <None Remove="Resources\smallicon.ico" />
     <None Remove="Resources\temperature.png" />
     <None Remove="Resources\throughput.png" />
@@ -75,6 +76,7 @@
     <EmbeddedResource Include="Resources\nvidia.png" />
     <EmbeddedResource Include="Resources\power.png" />
     <EmbeddedResource Include="Resources\ram.png" />
+    <EmbeddedResource Include="Resources\renderer.png" />
     <EmbeddedResource Include="Resources\smallicon.ico" />
     <EmbeddedResource Include="Resources\temperature.png" />
     <EmbeddedResource Include="Resources\throughput.png" />

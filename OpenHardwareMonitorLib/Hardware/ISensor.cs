@@ -30,6 +30,7 @@ namespace OpenHardwareMonitor.Hardware {
     Throughput, // MB/s = 2^20 Bytes/s
     RawValue, // i.e. Number of something
     TimeSpan, // s
+    FramesPerSecond, // FPS
   }
 
   public struct SensorValue {
