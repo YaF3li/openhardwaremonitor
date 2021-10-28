@@ -315,6 +315,10 @@ namespace OpenHardwareMonitor.GUI {
       return false;
     }
 
+    public bool Contains(IHardware hardware) {
+      return sensors.ContainsKey(hardware);
+    }
+
     public void Add(ISensor sensor) {
       if (Contains(sensor)) {
         return;
@@ -579,8 +583,9 @@ namespace OpenHardwareMonitor.GUI {
                 case SensorType.RawValue:
                   format = "{0:F0}";
                   break;
-                  
-
+                case SensorType.FramesPerSecond:
+                  format = "{0:F1} FPS";
+                  break;
               }
 
               switch (sensor.SensorType) {

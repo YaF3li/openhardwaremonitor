@@ -523,6 +523,8 @@ namespace OpenHardwareMonitor.Hardware.ATI {
           ActivateSensor(memoryUsageGB);
           ActivateSensor(memoryUsage);
         } else {
+          memoryUsageGB.Value = null;
+          memoryUsage.Value = null;
           DeactivateSensor(memoryUsageGB);
           DeactivateSensor(memoryUsage);
         }
@@ -531,11 +533,12 @@ namespace OpenHardwareMonitor.Hardware.ATI {
           float iFramesPerSecond = 0.0f;
           if (ADL.ADL2_Adapter_FrameMetrics_Get(context, adapterIndex, vidPnSourceId, out iFramesPerSecond)
             == ADLStatus.OK) {
-            if (iFramesPerSecond < 0.0f) iFramesPerSecond = 0.0f;
-            framesPerSecond.Value = iFramesPerSecond;
+            if (iFramesPerSecond < 0.0f) framesPerSecond.Value = null; //iFramesPerSecond = 0.0f;
+            else framesPerSecond.Value = iFramesPerSecond;
             ActivateSensor(framesPerSecond);
           } else {
             framesPerSecond.Value = null;
+            DeactivateSensor(framesPerSecond);
           }
         }
       } else {

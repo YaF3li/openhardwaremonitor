@@ -38,6 +38,7 @@ namespace OpenHardwareMonitor.GUI {
     private SystemTray systemTray;    
     private StartupManager startupManager = new StartupManager();
     private UpdateVisitor updateVisitor = new UpdateVisitor();
+    private UpdateGadgetVisitor updateGadgetVisitor;
     private SensorGadget gadget;
     private Form plotForm;
     private PlotPanel plotPanel;
@@ -159,6 +160,8 @@ namespace OpenHardwareMonitor.GUI {
 
         gadget = new SensorGadget(computer, settings, unitManager);
         gadget.HideShowCommand += hideShowClick;
+
+        updateGadgetVisitor = new UpdateGadgetVisitor(gadget);
 
         wmiProvider = new WmiProvider(computer);
       }
@@ -601,8 +604,18 @@ namespace OpenHardwareMonitor.GUI {
       Close();
     }
 
+    const int MIN_DELAY = 8;
     private int delayCount = 0;
     private void timer_Tick(object sender, EventArgs e) {
+      if (delayCount >= MIN_DELAY && gadget != null && updateGadgetVisitor != null) {
+        delayCount = (delayCount + 1) % 2 + MIN_DELAY;
+        if (delayCount > MIN_DELAY) {
+          computer.Accept(updateGadgetVisitor);
+          gadget.Redraw();
+          return;
+        }
+      }
+      
       computer.Accept(updateVisitor);
       treeView.Invalidate();
       plotPanel.InvalidatePlot();
@@ -614,10 +627,10 @@ namespace OpenHardwareMonitor.GUI {
         wmiProvider.Update();
 
 
-      if (logSensors != null && logSensors.Value && delayCount >= 4)
+      if (logSensors != null && logSensors.Value && delayCount >= MIN_DELAY)
         logger.Log();
 
-      if (delayCount < 4)
+      if (delayCount < MIN_DELAY)
         delayCount++;
     }
 
