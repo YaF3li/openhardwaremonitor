@@ -11,6 +11,7 @@
 using System;
 using System.Globalization;
 using System.Text;
+using System.Windows.Forms;
 
 namespace OpenHardwareMonitor.Hardware.ATI {
   internal sealed class ATIGPU : Hardware {
@@ -61,7 +62,12 @@ namespace OpenHardwareMonitor.Hardware.ATI {
       this.adapterIndex = adapterIndex;
       this.busNumber = busNumber;
       this.deviceNumber = deviceNumber;
-      this.vidPnSourceId = 0;
+
+      // Assuming all secondary displays are in extended mode
+      string displayName = Screen.PrimaryScreen.DeviceName;
+      int displayId = 1;
+      int.TryParse(displayName.Substring(displayName.Length - 1), out displayId);
+      this.vidPnSourceId = displayId - 1;
 
       this.context = context;
 
