@@ -62,6 +62,9 @@ namespace OpenHardwareMonitor.GUI {
           case HardwareType.Network:
             image = Utilities.EmbeddedResources.GetImage("network.png");
             break;
+          case HardwareType.FanControl:
+            image = Utilities.EmbeddedResources.GetImage("fan.png");
+            break;
           default:
             image = new Bitmap(1, 1);
             break;

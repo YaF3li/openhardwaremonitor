@@ -24,7 +24,8 @@ namespace OpenHardwareMonitor.Hardware {
     TBalancer,
     Heatmaster,
     HDD,
-    Network
+    Network,
+    FanControl
   }
 
   public interface IHardware : IElement, IDisposable {

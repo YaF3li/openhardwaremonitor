@@ -199,9 +199,11 @@ namespace OpenHardwareMonitor.Hardware {
       set {
         if (open && value != fanControllerEnabled) {
           if (value) {
+            Add(new Software.FanControl.SoftwareFanControlGroup(settings));
             Add(new TBalancer.TBalancerGroup(settings));
             Add(new Heatmaster.HeatmasterGroup(settings));
           } else {
+            RemoveType<Software.FanControl.SoftwareFanControlGroup>();
             RemoveType<TBalancer.TBalancerGroup>();
             RemoveType<Heatmaster.HeatmasterGroup>();
           }

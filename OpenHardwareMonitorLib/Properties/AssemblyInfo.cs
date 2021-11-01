@@ -22,6 +22,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
+[assembly: InternalsVisibleTo("OpenHardwareMonitor")]
+
 [assembly: ComVisible(false)]
 
 [assembly: DefaultDllImportSearchPaths(DllImportSearchPath.System32)]

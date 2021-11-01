@@ -102,6 +102,10 @@ namespace OpenHardwareMonitor.GUI {
             this.log1hMenuItem = new System.Windows.Forms.MenuItem();
             this.log2hMenuItem = new System.Windows.Forms.MenuItem();
             this.log6hMenuItem = new System.Windows.Forms.MenuItem();
+            this.fanControlMenuItemSeparator = new System.Windows.Forms.MenuItem();
+            this.fanControlMenuItem = new System.Windows.Forms.MenuItem();
+            this.fanControlSetupMenuItem = new System.Windows.Forms.MenuItem();
+            this.fanControlEnableMenuItem = new System.Windows.Forms.MenuItem();
             this.webMenuItemSeparator = new System.Windows.Forms.MenuItem();
             this.webMenuItem = new System.Windows.Forms.MenuItem();
             this.runWebServerMenuItem = new System.Windows.Forms.MenuItem();
@@ -381,6 +385,8 @@ namespace OpenHardwareMonitor.GUI {
             this.fastGadgetMenuItem,
             this.logSensorsMenuItem,
             this.loggingIntervalMenuItem,
+            this.fanControlMenuItemSeparator,
+            this.fanControlMenuItem,
             this.webMenuItemSeparator,
             this.webMenuItem});
             this.optionsMenuItem.Text = "Options";
@@ -571,14 +577,39 @@ namespace OpenHardwareMonitor.GUI {
             this.log6hMenuItem.RadioCheck = true;
             this.log6hMenuItem.Text = "6h";
             // 
+            // fanControlMenuItemSeparator
+            // 
+            this.fanControlMenuItemSeparator.Index = 11;
+            this.fanControlMenuItemSeparator.Text = "-";
+            //
+            // fanControlMenuItem
+            //
+            this.fanControlMenuItem.Index = 12;
+            this.fanControlMenuItem.Text = "Fan Control";
+            this.fanControlMenuItem.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+              this.fanControlEnableMenuItem,
+              this.fanControlSetupMenuItem});
+            //
+            // fanControlEnableMenuItem
+            // 
+            this.fanControlEnableMenuItem.Index = 0;
+            this.fanControlEnableMenuItem.Text = "Enabled";
+            this.fanControlEnableMenuItem.Click += new System.EventHandler(this.fanControlEnableMenuItem_Click);
+            //
+            // fanControlSetupMenuItem
+            // 
+            this.fanControlSetupMenuItem.Index = 1;
+            this.fanControlSetupMenuItem.Text = "Configure";
+            this.fanControlSetupMenuItem.Click += new System.EventHandler(this.fanControlSetupMenuItem_Click);
+            // 
             // webMenuItemSeparator
             // 
-            this.webMenuItemSeparator.Index = 11;
+            this.webMenuItemSeparator.Index = 13;
             this.webMenuItemSeparator.Text = "-";
             // 
             // webMenuItem
             // 
-            this.webMenuItem.Index = 12;
+            this.webMenuItem.Index = 14;
             this.webMenuItem.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.runWebServerMenuItem,
             this.serverPortMenuItem});
@@ -744,6 +775,7 @@ namespace OpenHardwareMonitor.GUI {
     private System.Windows.Forms.MenuItem minMenuItem;
     private System.Windows.Forms.MenuItem maxMenuItem;
     private System.Windows.Forms.MenuItem temperatureUnitsMenuItem;
+    private System.Windows.Forms.MenuItem fanControlMenuItemSeparator;
     private System.Windows.Forms.MenuItem webMenuItemSeparator;
     private System.Windows.Forms.MenuItem celsiusMenuItem;
     private System.Windows.Forms.MenuItem fahrenheitMenuItem;
@@ -759,7 +791,10 @@ namespace OpenHardwareMonitor.GUI {
     private System.Windows.Forms.MenuItem plotWindowMenuItem;
     private System.Windows.Forms.MenuItem plotBottomMenuItem;
     private System.Windows.Forms.MenuItem plotRightMenuItem;
-		private System.Windows.Forms.MenuItem webMenuItem;
+    private System.Windows.Forms.MenuItem fanControlMenuItem;
+    private System.Windows.Forms.MenuItem fanControlSetupMenuItem;
+    private System.Windows.Forms.MenuItem fanControlEnableMenuItem;
+    private System.Windows.Forms.MenuItem webMenuItem;
     private System.Windows.Forms.MenuItem runWebServerMenuItem;
     private System.Windows.Forms.MenuItem serverPortMenuItem;
     private System.Windows.Forms.MenuItem menuItem5;

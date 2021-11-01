@@ -66,6 +66,8 @@ namespace OpenHardwareMonitor.GUI {
     private UserRadioGroup plotLocation;
     private WmiProvider wmiProvider;
 
+    private FanControl fanControl;
+
     private UserOption runWebServer;
     private HttpServer server;
 
@@ -303,6 +305,8 @@ namespace OpenHardwareMonitor.GUI {
         unitManager.TemperatureUnit == TemperatureUnit.Celsius;
       fahrenheitMenuItem.Checked = !celsiusMenuItem.Checked;
 
+      fanControlMenuItem.Enabled = false;
+
       int networkPort = this.settings.GetValue("listenerPort", 8085);
       if (Program.Arguments.WebServerPort.HasValue) {
         networkPort = Program.Arguments.WebServerPort.Value;
@@ -376,6 +380,7 @@ namespace OpenHardwareMonitor.GUI {
 
       // Make sure the settings are saved when the user logs off
       Microsoft.Win32.SystemEvents.SessionEnded += delegate {
+        fanControl?.SetAllControlsToDefault();
         computer.Close();
         SaveConfiguration();
         if (runWebServer.Value) 
@@ -640,6 +645,16 @@ namespace OpenHardwareMonitor.GUI {
       if (wmiProvider != null)
         wmiProvider.Update();
 
+      if (delayCount >= MIN_DELAY) {
+        if (fanControl == null) {
+          fanControl = new FanControl(computer, settings);
+          fanControlMenuItem.Enabled = true;
+          fanControlEnableMenuItem.Checked = fanControl.IsEnabled;
+          if (!fanControl.IsEnabled) fanControl.SetAllControlsToDefault();
+        } else {
+          fanControl.Process(computer);
+        }
+      }
 
       if (logSensors != null && logSensors.Value && delayCount >= MIN_DELAY)
         logger.Log();
@@ -712,6 +727,7 @@ namespace OpenHardwareMonitor.GUI {
     }
     
     private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
+      fanControl?.SetAllControlsToDefault();
       Visible = false;      
       systemTray.IsMainIconEnabled = false;
       timer.Enabled = false;            
@@ -1007,7 +1023,26 @@ namespace OpenHardwareMonitor.GUI {
     }
 
     private void serverPortMenuItem_Click(object sender, EventArgs e) {
-      new PortForm(this).ShowDialog();
+      new PortForm(this).ShowDialog(this);
+    }
+
+    private void fanControlEnableMenuItem_Click(object sender, EventArgs e) {
+      fanControlEnableMenuItem.Checked = !fanControlEnableMenuItem.Checked;
+      fanControl.IsEnabled = fanControlEnableMenuItem.Checked;
+      if (!fanControl.IsEnabled)
+        fanControl.SetAllControlsToDefault();
+      fanControl.Save();
+    }
+
+    private void fanControlSetupMenuItem_Click(object sender, EventArgs e) {
+      FanControlForm fcf = new FanControlForm(computer, settings);
+      if (fcf.ShowDialog(this) == DialogResult.OK) {
+        bool wasEnabled = fanControl.IsEnabled;
+        fanControl.Load();
+        fanControlEnableMenuItem.Checked = fanControl.IsEnabled;
+        if (wasEnabled && !fanControl.IsEnabled)
+          fanControl.SetAllControlsToDefault();
+      }
     }
 
     public HttpServer Server {
