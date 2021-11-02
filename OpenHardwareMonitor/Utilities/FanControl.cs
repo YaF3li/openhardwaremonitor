@@ -13,6 +13,7 @@ namespace OpenHardwareMonitor.Utilities {
   internal class FanControl {
     private static class Settings {
       public const string ENABLED = "fanControl.enabled";
+      public const string RAMPUPDOWN = "fanControl.rampupdown";
       public const string SENSORS = "fanControl.sensors";
       public const string CONTROL = "fanControl.controllers";
       public const string CURVE = "fanControl.curve";
@@ -25,6 +26,9 @@ namespace OpenHardwareMonitor.Utilities {
     protected Curve curve;
 
     public FanControl(Computer computer, PersistentSettings settings) {
+      UseRampUpDown = true;
+      DelayTime = 3.25;
+
       this.settings = settings;
       Load(settings);
 
@@ -63,6 +67,8 @@ namespace OpenHardwareMonitor.Utilities {
     }
 
     public bool IsEnabled { get; set; }
+    public bool UseRampUpDown { get; set; }
+    public double DelayTime { get; set; }
     public int SensorCount { get => sensors.Count; }
     public int ControlCount { get => controllers.Count; }
 
@@ -84,17 +90,21 @@ namespace OpenHardwareMonitor.Utilities {
 
       if (point != null) {
 
-        if (DateTime.Now - lastChange <= TimeSpan.FromSeconds(3.25)) {
+        if (DateTime.Now - lastChange <= TimeSpan.FromSeconds(DelayTime)) {
           if(lastPoint != null)
-            point = lastPoint; // Keep last one for at least 3 seconds
+            point = lastPoint; // Keep last one for at least a few seconds
         }
 
-        point.Apply(controllers.Select(sid => sid.Sensor).ToList(), 6);
+        if (UseRampUpDown)
+          point.Apply(controllers.Select(sid => sid.Sensor).ToList(), 6);
 
         if (point == lastPoint) return;
         lastPoint = point;
 
-        if (swFanControl != null) {
+        if (!UseRampUpDown)
+          point.Apply(controllers.Select(sid => sid.Sensor).ToList(), 1);
+
+          if (swFanControl != null) {
           if(level >= 0 && curve.PointsCount > 0)
             swFanControl.FanLevel = (level + 1.0) * 100.0 / curve.PointsCount;
           else
@@ -149,6 +159,7 @@ namespace OpenHardwareMonitor.Utilities {
 
     protected void Load(PersistentSettings settings) {
       IsEnabled = settings.GetValue(Settings.ENABLED, false);
+      UseRampUpDown = settings.GetValue(Settings.RAMPUPDOWN, true);
 
       string sensorSet = settings.GetValue(Settings.SENSORS, string.Empty);
       if (!string.IsNullOrWhiteSpace(sensorSet)) {
@@ -179,6 +190,7 @@ namespace OpenHardwareMonitor.Utilities {
 
     protected void Save(PersistentSettings settings) {
       settings.SetValue(Settings.ENABLED, IsEnabled);
+      settings.SetValue(Settings.RAMPUPDOWN, UseRampUpDown);
       settings.SetValue(Settings.CONTROL, string.Join(SEPARATOR.ToString(), controllers));
       settings.SetValue(Settings.SENSORS, string.Join(SEPARATOR.ToString(), sensors));
       settings.SetValue(Settings.CURVE, curve.ToString());
@@ -293,7 +305,7 @@ namespace OpenHardwareMonitor.Utilities {
 
         if (!IsValidValue(controlValues[i])) continue;
 
-        if (sensor.Value != null && Math.Abs(control.SoftwareValue - (float)sensor.Value) > MIN_CHANGE)
+        if (sensor.Value != null && ticks > 1 && Math.Abs(control.SoftwareValue - (float)sensor.Value) > MIN_CHANGE)
           control.SetSoftware(ToSoftwareValue(control, (float)sensor.Value));
 
         float diff = ToSoftwareValue(control, controlValues[i]) - control.SoftwareValue;

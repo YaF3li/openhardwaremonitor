@@ -29,7 +29,11 @@
             this.cancelBtn = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.settingsBox = new System.Windows.Forms.TextBox();
+            this.rampChk = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.holdTimeNud = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.holdTimeNud)).BeginInit();
             this.SuspendLayout();
             // 
             // controlEnabledChk
@@ -46,8 +50,7 @@
             // acceptBtn
             // 
             this.acceptBtn.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.acceptBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.acceptBtn.Location = new System.Drawing.Point(403, 398);
+            this.acceptBtn.Location = new System.Drawing.Point(403, 396);
             this.acceptBtn.Name = "acceptBtn";
             this.acceptBtn.Size = new System.Drawing.Size(194, 49);
             this.acceptBtn.TabIndex = 1;
@@ -58,8 +61,7 @@
             // cancelBtn
             // 
             this.cancelBtn.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cancelBtn.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cancelBtn.Location = new System.Drawing.Point(603, 398);
+            this.cancelBtn.Location = new System.Drawing.Point(603, 396);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(194, 49);
             this.cancelBtn.TabIndex = 2;
@@ -74,17 +76,21 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.tableLayoutPanel1.Controls.Add(this.controlEnabledChk, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.cancelBtn, 3, 4);
-            this.tableLayoutPanel1.Controls.Add(this.acceptBtn, 2, 4);
             this.tableLayoutPanel1.Controls.Add(this.settingsBox, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.acceptBtn, 2, 5);
+            this.tableLayoutPanel1.Controls.Add(this.cancelBtn, 3, 5);
+            this.tableLayoutPanel1.Controls.Add(this.rampChk, 2, 4);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.holdTimeNud, 1, 4);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 5;
+            this.tableLayoutPanel1.RowCount = 6;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 450);
             this.tableLayoutPanel1.TabIndex = 3;
@@ -99,9 +105,50 @@
             this.settingsBox.Name = "settingsBox";
             this.tableLayoutPanel1.SetRowSpan(this.settingsBox, 3);
             this.settingsBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.settingsBox.Size = new System.Drawing.Size(794, 354);
+            this.settingsBox.Size = new System.Drawing.Size(794, 315);
             this.settingsBox.TabIndex = 3;
             this.settingsBox.WordWrap = false;
+            // 
+            // rampChk
+            // 
+            this.tableLayoutPanel1.SetColumnSpan(this.rampChk, 2);
+            this.rampChk.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rampChk.Location = new System.Drawing.Point(403, 359);
+            this.rampChk.Name = "rampChk";
+            this.rampChk.Size = new System.Drawing.Size(394, 31);
+            this.rampChk.TabIndex = 4;
+            this.rampChk.Text = "Gradual ramp up / down";
+            this.rampChk.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label1.Location = new System.Drawing.Point(3, 356);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(194, 37);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Hold Time (sec):";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // holdTimeNud
+            // 
+            this.holdTimeNud.DecimalPlaces = 2;
+            this.holdTimeNud.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.holdTimeNud.Increment = new decimal(new int[] {
+            25,
+            0,
+            0,
+            131072});
+            this.holdTimeNud.Location = new System.Drawing.Point(203, 359);
+            this.holdTimeNud.Maximum = new decimal(new int[] {
+            24,
+            0,
+            0,
+            0});
+            this.holdTimeNud.MaximumSize = new System.Drawing.Size(120, 0);
+            this.holdTimeNud.Name = "holdTimeNud";
+            this.holdTimeNud.Size = new System.Drawing.Size(120, 31);
+            this.holdTimeNud.TabIndex = 6;
             // 
             // FanControlForm
             // 
@@ -116,6 +163,7 @@
             this.Text = "Fan Control";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.holdTimeNud)).EndInit();
             this.ResumeLayout(false);
 
     }
@@ -127,5 +175,8 @@
     private System.Windows.Forms.Button cancelBtn;
     private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
     private System.Windows.Forms.TextBox settingsBox;
+    private System.Windows.Forms.CheckBox rampChk;
+    private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.NumericUpDown holdTimeNud;
   }
 }

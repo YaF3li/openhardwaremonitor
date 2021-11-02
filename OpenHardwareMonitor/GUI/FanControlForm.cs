@@ -11,6 +11,8 @@ namespace OpenHardwareMonitor.GUI {
       InitializeComponent();
       fanControl = new FanControl(computer, settings);
       controlEnabledChk.Checked = fanControl.IsEnabled;
+      rampChk.Checked = fanControl.UseRampUpDown;
+      holdTimeNud.Value = (decimal)fanControl.DelayTime;
       settingsBox.Text = fanControl.ToString();
       if(settingsBox.Lines.Length >= 2 && settingsBox.Lines[1] == "0") {
         string curve = fanControl.SensorCount + "," + fanControl.ControlCount;
@@ -22,6 +24,8 @@ namespace OpenHardwareMonitor.GUI {
 
     private void acceptBtn_Click(object sender, EventArgs e) {
       fanControl.IsEnabled = controlEnabledChk.Checked;
+      fanControl.UseRampUpDown = rampChk.Checked;
+      fanControl.DelayTime = (double)holdTimeNud.Value;
       string curve = (settingsBox.Lines.Length - 2).ToString();
       for (int i = 2; i < settingsBox.Lines.Length; i++) {
         curve += ";" + settingsBox.Lines[i].Replace(" ", "");
