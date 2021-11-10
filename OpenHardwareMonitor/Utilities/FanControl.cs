@@ -14,6 +14,7 @@ namespace OpenHardwareMonitor.Utilities {
     private static class Settings {
       public const string ENABLED = "fanControl.enabled";
       public const string RAMPUPDOWN = "fanControl.rampupdown";
+      public const string DELAYTIME = "fanControl.delaytime";
       public const string SENSORS = "fanControl.sensors";
       public const string CONTROL = "fanControl.controllers";
       public const string CURVE = "fanControl.curve";
@@ -77,7 +78,7 @@ namespace OpenHardwareMonitor.Utilities {
     }
 
     private CurvePoint lastPoint;
-    private DateTime lastChange = DateTime.MinValue;
+    private DateTime lastStepTime = DateTime.MinValue;
     public void Process(Computer computer) {
       if (!IsEnabled) {
         if (swFanControl != null && swFanControl.FanLevel > 0)
@@ -88,13 +89,24 @@ namespace OpenHardwareMonitor.Utilities {
       int level;
       CurvePoint point = curve.FindApplicable(sensors.Select(sid => (sid.Sensor?.Value != null ? (float)sid.Sensor.Value : -1.0f)).ToList(), out level);
 
+      int diff = 0;
+      if (lastPoint != null && point != null)
+        diff = point.CompareTo(lastPoint);
+      else if (lastPoint != null) // point == null
+        diff = -1; // point is less than last point
+      else if (point != null) // lastPoint == null
+        diff = 1; // point is more than last point
+
+      if(diff >= 0)
+        lastStepTime = DateTime.Now;
+
+      // When step down is required, we want to wait a specified amount of time before doing so
+      if (diff < 0 && (DateTime.Now - lastStepTime) <= TimeSpan.FromSeconds(DelayTime)) {
+        if (lastPoint != null)
+          point = lastPoint; // Keep last one for at least a few seconds
+      }
+
       if (point != null) {
-
-        if (DateTime.Now - lastChange <= TimeSpan.FromSeconds(DelayTime)) {
-          if(lastPoint != null)
-            point = lastPoint; // Keep last one for at least a few seconds
-        }
-
         if (UseRampUpDown)
           point.Apply(controllers.Select(sid => sid.Sensor).ToList(), 6);
 
@@ -111,7 +123,7 @@ namespace OpenHardwareMonitor.Utilities {
             swFanControl.FanLevel = 0;
         }
 
-      } else {
+      } else if(diff != 0) {
 
         SetAllControlsToDefault();
         lastPoint = null;
@@ -120,8 +132,6 @@ namespace OpenHardwareMonitor.Utilities {
           swFanControl.FanLevel = 0;
 
       }
-
-      lastChange = DateTime.Now;
     }
 
     public void SetAllControlsToDefault() {
@@ -160,6 +170,7 @@ namespace OpenHardwareMonitor.Utilities {
     protected void Load(PersistentSettings settings) {
       IsEnabled = settings.GetValue(Settings.ENABLED, false);
       UseRampUpDown = settings.GetValue(Settings.RAMPUPDOWN, true);
+      DelayTime = settings.GetValue(Settings.DELAYTIME, 3.25f);
 
       string sensorSet = settings.GetValue(Settings.SENSORS, string.Empty);
       if (!string.IsNullOrWhiteSpace(sensorSet)) {
@@ -191,6 +202,7 @@ namespace OpenHardwareMonitor.Utilities {
     protected void Save(PersistentSettings settings) {
       settings.SetValue(Settings.ENABLED, IsEnabled);
       settings.SetValue(Settings.RAMPUPDOWN, UseRampUpDown);
+      settings.SetValue(Settings.DELAYTIME, (float)DelayTime);
       settings.SetValue(Settings.CONTROL, string.Join(SEPARATOR.ToString(), controllers));
       settings.SetValue(Settings.SENSORS, string.Join(SEPARATOR.ToString(), sensors));
       settings.SetValue(Settings.CURVE, curve.ToString());
