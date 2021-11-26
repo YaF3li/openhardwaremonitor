@@ -27,6 +27,7 @@ namespace OpenHardwareMonitor.Hardware.CPU {
     private readonly Sensor packagePowerSensor;
     private readonly Sensor coresPowerSensor;
     private readonly Sensor busClock;
+    private readonly Sensor maxCoreClock;
 
     private const uint FAMILY_17H_M01H_THM_TCON_TEMP = 0x00059800;
     private const uint FAMILY_17H_M01H_THM_TCON_TEMP_RANGE_SEL = 0x80000;
@@ -130,6 +131,8 @@ namespace OpenHardwareMonitor.Hardware.CPU {
           timeStampCounterMultiplier);
         ActivateSensor(busClock);
       }
+
+      maxCoreClock = new Sensor("CPU Core Max", 1, SensorType.Clock, this, settings);
 
       this.cores = new Core[coreCount];
       for (int i = 0; i < this.cores.Length; i++) {
@@ -268,14 +271,26 @@ namespace OpenHardwareMonitor.Hardware.CPU {
       }
 
       double? coresPower = 0f;
+      double? maxClock = 0f;
       for (int i = 0; i < cores.Length; i++) {
         cores[i].Update();
         coresPower += cores[i].Power;
+        double? clock = cores[i].Clock;
+        if (clock.HasValue && clock > maxClock) {
+          maxClock = clock;
+        }
       }
+
       coresPowerSensor.Value = coresPower;
 
       if (coresPower.HasValue) {
         ActivateSensor(coresPowerSensor);
+      }
+
+      maxCoreClock.Value = maxClock;
+
+      if (maxClock.HasValue) {
+        ActivateSensor(maxCoreClock);
       }
     }
 
@@ -300,7 +315,7 @@ namespace OpenHardwareMonitor.Hardware.CPU {
         this.powerSensor =
           new Sensor(coreString, index + 2, SensorType.Power, cpu, settings);
         this.clockSensor = 
-          new Sensor(coreString, index + 1, SensorType.Clock, cpu, settings);
+          new Sensor(coreString, index + 2, SensorType.Clock, cpu, settings);
 
         if (cpu.energyUnitMultiplier != 0) {
           if (Ring0.RdmsrTx(MSR_CORE_ENERGY_STAT, out uint energyConsumed, 
@@ -324,6 +339,8 @@ namespace OpenHardwareMonitor.Hardware.CPU {
       }
 
       public double? Power { get { return power; } }
+
+      public double? Clock { get { return clockSensor.Value; } }
 
       public void Update() {
         DateTime energyTime = DateTime.MinValue;
